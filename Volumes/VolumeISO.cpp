@@ -38,9 +38,17 @@ void VolumeISO::getTrackType() {
 		sector = readSectors(contiguous ? 17 : startSector + 17, 1, true);
 		uint8_t* sector1;
 		sector1 = readSectors(contiguous ? 18 : startSector + 18, 1, true);
-		if (compareBytes(0, 6, sector, jolietmagicword) || compareBytes(0, 6, sector1, jolietmagicword)) {
+		if (compareBytes(0, 6, sector, jolietmagicword)) {
 			disctype = "joliet";
 			pvd = new PVD(sector, track, "joliet");
+			delete[] sector;
+			delete[] sector1;
+			filetree = generateDirectories(pvd->rootDir, L"");
+			return;
+		}
+		else if (compareBytes(0, 6, sector1, jolietmagicword)){
+			disctype = "joliet";
+			pvd = new PVD(sector1, track, "joliet");
 			delete[] sector;
 			delete[] sector1;
 			filetree = generateDirectories(pvd->rootDir, L"");
